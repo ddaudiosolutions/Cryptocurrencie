@@ -1,295 +1,245 @@
 
-let xrpP = document.querySelector('#rippleP')
-let bitP = document.querySelector('#bitcoinP')
-let ethP = document.querySelector('#etherP')
+let moneda1 = document.getElementById('moneda1');
+let moneda2 = document.getElementById('moneda2')
+let moneda3 = document.getElementById('moneda3')
 
-let ripC = document.querySelector('#ripC')
-let ripC24 = document.querySelector('#ripC24')
-let ripC7d = document.querySelector('#ripC7')
-
-let bitC = document.querySelector('#bitC')
-let bitC24 = document.querySelector('#bitC24')
-let bitC7d = document.querySelector('#bitC7d')
+let m1P = document.querySelector('#m1P')
 
 
-let ethC1h = document.querySelector('#ethC1h')
-let ethC24 = document.querySelector('#ethC24')
-let ethC7d = document.querySelector('#ethC7d')
+let m1C = document.querySelector('#m1C')
+let m1C24 = document.querySelector('#m1C24')
+let m1C7d = document.querySelector('#m1C7')
 
 
 
 
-let url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ripple%2C%20bitcoin%2C%20ethereum&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=1h%2C24h%2C7d';
 
-fetch (url) 
+//LISTAR LAS OPCIONES DE MONEDAS SELECCIONADAS.
+let listadoMonedas = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1'
+//console.log(listadoMonedas)
+
+  fetch (listadoMonedas) 
+      .then((respuesta) => { respuesta.json()
+      .then(monedas => listarMonedas(monedas) ) 
+      }).catch((err) => {
+          console.log(err)
+          
+      });
+
+  function listarMonedas (monedas){
+    for (moneda of monedas){
+      //console.log (moneda.id)
+      let opcion = document.createElement('option')
+      opcion.value = moneda.id
+      opcion.innerText = moneda.id.toUpperCase()
+      moneda1.appendChild(opcion)
+    }
+    
+  }
+
+function seleccionMoneda1(){
+  
+    let url1 = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${moneda1.value}&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=1h%2C24h%2C7d`;
+    
+  fetch (url1) 
     .then((respuesta) => { respuesta.json()
-    .then(cotizacion => datosCotizacion(cotizacion) )
-        
+    .then(cotizacion1 => datosCotizacion(cotizacion1) ) 
     }).catch((err) => {
         console.log(err)
         
     });
+
+    let moneda1Gr = moneda1.value
+    grafico1(moneda1Gr);
+
+  
+
+}
+
+ 
+    function datosCotizacion(cotizacion1){         
+        limpiarhtml()
+
+       const logo = document.querySelector('#logo')
+       const linkLogo = document.createElement('img')
+       linkLogo.src = cotizacion1[0].image
+       linkLogo.setAttribute("width", '50px')
+       linkLogo.style.marginTop = '10px'
+       logo.appendChild(linkLogo)
+
+        const rotulo1 = document.querySelector('#moneda1Rotulo')
+        rotulo1.innerText = cotizacion1[0].id.toUpperCase()
     
-    
-    function datosCotizacion(cotizacion){ 
-       //console.log(cotizacion)
-    
-        let rippleC1h = cotizacion[2].price_change_percentage_1h_in_currency
-        rippleC1h = rippleC1h.toFixed(2)
+        let moneda1C1h = cotizacion1[0].price_change_percentage_1h_in_currency
+        moneda1C1h = moneda1C1h.toFixed(2)
 
-        let rippleC24h = cotizacion[2].price_change_percentage_24h
-        rippleC24h = rippleC24h.toFixed(2)
+        let moneda1C24h = cotizacion1[0].price_change_percentage_24h
+        moneda1C24h = moneda1C24h.toFixed(2)
 
-        let rippleC7d = cotizacion[2].price_change_percentage_7d_in_currency
-        rippleC7d = rippleC7d.toFixed(2)
+        let moneda1C7d = cotizacion1[0].price_change_percentage_7d_in_currency
+        moneda1C7d = moneda1C7d.toFixed(2)
+
+        let moneda = cotizacion1[0].id.toUpperCase()
         
+        m1P.innerHTML = `${moneda} Price: $${cotizacion1[0].current_price}USD`
+        m1C.innerHTML = `Price Change (1h): ${moneda1C1h}%`;
+        m1C24.innerHTML = `Price Change (24h): ${moneda1C24h}%`;
+        m1C7d.innerHTML = `Price Change (7d): ${moneda1C7d}%`;
         
-
-        let bitCC1h = cotizacion[0].price_change_percentage_1h_in_currency
-        bitCC1h = bitCC1h.toFixed(2)
-        let bitCC24h = cotizacion[0].price_change_percentage_24h
-        bitCC24h = bitCC24h.toFixed(2)
-        let bitCC7d = cotizacion[0].price_change_percentage_7d_in_currency
-        bitCC7d = bitCC7d.toFixed(2)
-        
-        
-        let etherC1h = cotizacion[1].price_change_percentage_1h_in_currency
-        etherC1h = etherC1h.toFixed(2)
-        let etherCC24h = cotizacion[1].price_change_percentage_24h_in_currency
-        etherCC24h = etherCC24h.toFixed(2)
-        let etherC7d = cotizacion[1].price_change_percentage_7d_in_currency
-        etherC7d = etherC7d.toFixed(2)
-        //console.log(etherC7d, etherCC24h, etherC1h)
-        
-
-        xrpP.innerHTML = `XRP Price: $${cotizacion[2].current_price}USD`
-        bitP.innerHTML = `BTC Price: $${cotizacion[0].current_price}USD`
-        ethP.innerHTML = `ETH Price: $${cotizacion[1].current_price}USD`
-
-        ripC.innerHTML = `Price Change (1h): ${rippleC1h}%`;
-        ripC24.innerHTML = `Price Change (24h): ${rippleC24h}%`;
-        ripC7d.innerHTML = `Price Change (7d): ${rippleC7d}%`;
-
-
-        bitC.innerHTML =`Price Change (1h): ${bitCC1h}%`;
-        bitC24.innerHTML =`Price Change (24h): ${bitCC24h}%`;
-        bitC7d.innerHTML =`Price Change (7d): ${bitCC7d}%`;
-
-         ethC1h.textContent = `Price Change (1h): ${etherC1h}%`; 
-         ethC24.textContent = `Price Change(24h): ${etherCC24h}%`;
-         ethC7d.textContent = `Price Change (7d): ${etherC7d}%`;
-        
-
-        if(rippleC1h <0){
-            ripC.style.backgroundColor = 'red';
+        if(moneda1C1h <0){
+          m1C.style.backgroundColor = 'red';
         }else {
-            ripC.style.backgroundColor = '#50ce07';
+          m1C.style.backgroundColor = '#50ce07';
         }
 
-        if(rippleC24h <0){
-            ripC24.style.backgroundColor = 'red';
+        if(moneda1C24h <0){
+            m1C24.style.backgroundColor = 'red';
         }else {
-            ripC24.style.backgroundColor = '#50ce07';
+            m1C24.style.backgroundColor = '#50ce07';
         }
 
-        if(rippleC7d <0){
-            ripC7d.style.backgroundColor = 'red';
+        if(moneda1C7d  <0){
+            m1C7d.style.backgroundColor = 'red';
         }else {
-            ripC7d.style.backgroundColor = '#50ce07';
+            m1C7d.style.backgroundColor = '#50ce07';
         }
 
+      }
 
-        if(bitCC24h <0){
-            bitC24.style.backgroundColor = 'red';
-        }else {
-            bitC24.style.backgroundColor = '#50ce07';
+      //LIMPIAR HTML
+      function limpiarhtml()
+      {
+        while (logo.firstChild){
+            logo.removeChild(logo.firstChild);
         }
-        if(bitCC1h <0){
-            bitC.style.backgroundColor = 'red';
-        }else {
-            bitC.style.backgroundColor = '#50ce07';
-        }
-        if(bitCC7d <0){
-            bitC7d.style.backgroundColor = 'red';
-        }else {
-            bitC7d.style.backgroundColor = '#50ce07';
-        }
+      }
+      
+      //LIMPIAR CHARTJS CANVAS PARA EVITAR SUPERPOSICIÓN DE GRÁFICOS
+      var in_canvas = document.getElementById('chartcontainer'); 
 
-        if(etherC1h <0){
-            ethC1h.style.backgroundColor = 'red';
-        }else {
-            ethC1h.style.backgroundColor = '#50ce07';
-        }
-        if(etherCC24h <0){
-            ethC24.style.backgroundColor = 'red';
-        }else {
-            ethC24.style.backgroundColor = '#50ce07';
-        }
-        if(etherC7d <0){
-            ethC7d.style.backgroundColor = 'red';
-        }else {
-            ethC7d.style.backgroundColor = '#50ce07';
-        }
+      function limpiarChart(){
+        //remove canvas if present
+        while (in_canvas.firstChild) {
+          in_canvas.removeChild(in_canvas.firstChild);
+          } 
+      }
 
-        
-
-    }
-
-
-    
-let urlChart = 'https://api.coingecko.com/api/v3/coins/ripple/market_chart?vs_currency=usd&days=30';
-
-fetch (urlChart) 
-    .then((respuesta) => { respuesta.json()
-    .then(valores => dataPoints(valores) )
-        
-    }).catch((err) => {
-        console.log(err)
-        
-    });
-    var dataPointsV = []
-
-    function dataPoints (valores){        
-        for (let valor of valores.prices){
-            let fecha = valor[0]
-            let precio = valor[1]
-           //console.log(precio)
-            dataPointsV.push ({x: new Date(fecha), y: (precio)})
-
-        }
-        //console.log(dataPointsV)
-        
-        var chart = new CanvasJS.Chart("chartContainer", {
-            theme: "light1", // "light1", "light2", "dark1", "dark2"
-	    animationEnabled: true,
-	    title:{
-		text: "Ripple Currency 30d"   
-        },
-        axisX: {
-            interval: 1,
-            intervalType: "month",
-            //valueFormatString: "DDD, MMM, YY"
-        },
-        axisY:{
-            title: "Price (in USD)",
-            includeZero: true,
-            //valueFormatString: "$#0"
-        },
-            data: [{
-              
-              type: "line",              
-              xValueFormatString: "DDD DD, MMM, YYYY",
-              yValueFormatString: "$#.##",
-              dataPoints: dataPointsV,
-            }]
-          });
-        
-          chart.render();
-    }
-
-
-    let urlChartbitcoin = 'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=30';
-
-fetch (urlChartbitcoin) 
-    .then((respuesta) => { respuesta.json()
-    .then(valoresbtc => dataPointsbtc(valoresbtc) )
-        
-    }).catch((err) => {
-        console.log(err)
-        
-    });
-    var dataPointsVbtc = []
-
-    function dataPointsbtc (valoresbtc){        
-        for (let valorbtc of valoresbtc.prices){
-            let fecha = valorbtc[0]
-            let precio = valorbtc[1]
-           //console.log(precio)
-           dataPointsVbtc.push ({x: new Date(fecha), y: (precio)})
-
-        }
-        //console.log(dataPointsV)
-        
-        var chartbtc = new CanvasJS.Chart("chartContainerbtc", {
-            theme: "light1", // "light1", "light2", "dark1", "dark2"
-	    animationEnabled: true,
-	    title:{
-		text: "Bitcoin Currency 30d"   
-        },
-        axisX: {
-            interval: 1,
-            intervalType: "month",
-            //valueFormatString: "DDD, MMM, YY"
-        },
-        axisY:{
-            title: "Price (in USD)",
-            includeZero: true,
-            //valueFormatString: "$#0"
-        },
-            data: [{
-              
-              type: "line",              
-              xValueFormatString: "DDD DD, MMM, YYYY",
-              yValueFormatString: "$#.##",
-              dataPoints: dataPointsVbtc,
-            }]
-          });
-        
-          chartbtc.render();
-    }
+      //GRAFICO MONEDA 1
+     
+      function grafico1(moneda1Gr) {
        
+       limpiarChart() 
 
-    //ETHEREUM CHART
-
-    let urlChartEth = 'https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=30';
-
-fetch (urlChartEth) 
-    .then((respuesta) => { respuesta.json()
-    .then(valoreseth => dataPointsEth(valoreseth) )
+       let urlchart1 = `https://api.coingecko.com/api/v3/coins/${moneda1Gr}/market_chart?vs_currency=usd&days=30`;
         
-    }).catch((err) => {
-        console.log(err)
-        
-    });
-    var dataPointsVeth = []
-
-    function dataPointsEth (valoreseth){        
-        for (let valoreth of valoreseth.prices){
-            let fecha = valoreth[0]
-            let precio = valoreth[1]
-           //console.log(precio)
-           dataPointsVeth.push ({x: new Date(fecha), y: (precio)})
-
-        }
-        //console.log(dataPointsV)
-        
-        var chartEth = new CanvasJS.Chart("chartContainereth", {
-            theme: "light3", // "light1", "light2", "dark1", "dark2"
-            animationEnabled: true,
-            title:{
-            text: "Ethereum Currency 30d"   
-            },
-        axisX: {
-            interval: 1,
-            intervalType: "month",
-            //valueFormatString: "DDD, MMM, YY"
-        },
-        axisY:{
-            title: "Price (in USD)",
-            includeZero: true,
-            //valueFormatString: "$#0"
-        },
-            data: [{
-              type: "line",              
-              xValueFormatString: "DDD DD, MMM, YYYY",
-              yValueFormatString: "$#.##",
-              dataPoints: dataPointsVeth,
-            }]
+      
+        fetch (urlchart1) 
+          .then((respuesta) => {respuesta.json()      
+          .then(valores => dataPoints(valores) )        
+          }).catch((err) => {
+              console.log(err)
+              
           });
-        
-          chartEth.render();
-    }
-
+          var dataPointsV = []
+          var dataSetTime = []
+          function dataPoints (valores){        
+             
+              for (let i=0; i<valores.prices.length; i++){
+                  let fecha = valores.prices[i][0]
+                  let fechas = new Date (fecha)
+                  let myDate = (fechas.getUTCDate()) +  "/" + (fechas.getMonth() + 1);
+                  dataSetTime.push(myDate)
+                  //console.log(dataSetTime)
+              }
+              for (let i=0; i<valores.prices.length; i++){
+                 // let fecha = valores.prices[i][0]
+                  let precio = valores.prices[i][1]
+                  dataPointsV.push({ y: (precio)})
+                  //console.log(fecha + ' ' + precio)
+              }
+              
+              
+              var colors = ['#007bff','#0097fc','#333333','#c3e6cb','#dc3545','#ed872d']; 
+       
+              //var chLine2 = document.querySelector("#chLine2");   
+                
             
+            //insert canvas
+                var newCanvas = document.createElement('canvas');                
+                newCanvas.id = "chLine2";                
+                in_canvas.appendChild(newCanvas);
+              
+      
+              var chartData = {
+               labels:  dataSetTime,
+               datasets: [{
+                  data: dataPointsV,
+                  backgroundColor: 'transparent',
+                  borderColor: colors[1],
+                  borderWidth: 2,
+                  pointBackgroundColor: colors[3],
+                      pointStyle: 'dash'
+              }]              
+              };
+
+              
+              /* large line chart */
+               if(chLine2) {       
+              new Chart(chLine2, {
+              type: 'line',
+              data: chartData,
+              options: {
+                elements:{
+                  point:{
+                    radius: 0
+                  }
+                },
+                scales: {
+                yAxes: [{
+                    ticks: {
+                      //suggestedMax: maxWind + 2, 
+                    beginAtZero: true,
+                    stepSize: 0.5,
+                    maxTicksLimit: 12
+                    }
+                }],
+                xAxes:[{
+                  ticks: {
+                    autoSkip: true,
+                    maxTicksLimit: 12            
+                  }
+                }]
+                },
+                legend: {
+                display: false
+                }
+            }
+              });
+              
+          }   
+          }
+      
+    }
+        
+      
+      
+
        
+       
+        
+
+        
+
+
+       
+
+        
+
     
+
+
+
+
+
+
+
